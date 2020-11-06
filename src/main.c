@@ -15,6 +15,8 @@
 #define CHIP_NAME "ESP32-S2 Beta"
 #endif
 
+uint16_t buff[800*480] = {0};
+
 void app_main(void)
 {
         printf("app_main\n");

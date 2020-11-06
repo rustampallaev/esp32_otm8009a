@@ -9,6 +9,10 @@
 #include "lcd.h"
 #include "gfx.h"
 #include "gfx_menu.h"
+#include "nrf24l01.h"
+
+
+#define nRF24_WAIT_TIMEOUT         (uint32_t)0x000FFFFF
 
 
 static xQueueHandle gpio_evt_queue = NULL;
@@ -33,15 +37,24 @@ static void application_thread(void * pvParameters)
         GFX_COLOR_LIGHT_BLUE
     };
 
+    uint8_t nrf_payload[32];
+    nrf_rx_result nrf_pipe;
+    uint8_t nrf_payload_length;
+
     printf("application_thread\n");
 
     gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
 
-    
+
     gfx_backligh(0);
     gfx_init(application_touch_isr_handler);
     gfx_menu_main();
     gfx_backligh(1);
+
+
+    nrf_init();
+    uint8_t check = nrf_check();
+    printf("nrf check %x\r\n", check);
 
     for(;;) {
         
@@ -49,6 +62,9 @@ static void application_thread(void * pvParameters)
             //printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
             if (io_num && gpio_get_level(io_num) == 0) {
                 ts_count = gfx_ts_read(ts_x, ts_y);
+                if (ts_count == 0)
+                    continue;
+                
                 if (ts_count == 1 && ts_x[0] >= 600 && ts_x[0] <= 800 && ts_y[0] >= 420 && ts_y[0] <= 480) {
                     lcd_clear(GFX_COLOR_WHITE);
                     gfx_menu_main(); 
@@ -61,6 +77,15 @@ static void application_thread(void * pvParameters)
                 }
             }
         }
+        if (nrf_get_status_rx_fifo() != NRF_STATUS_RXFIFO_EMPTY) {
+    		nrf_pipe = nrf_read_payload(nrf_payload, &nrf_payload_length);
+			nrf_clear_irq_flags();
+
+			printf("received pipe: %d\r\n\tpayload: ", nrf_pipe);
+            for(int i = 0; i < nrf_payload_length; i++)
+                printf("%2x ", nrf_payload[i]);
+            printf("\r\n");
+    	}
         //delay_rtos(1);
     }
 }

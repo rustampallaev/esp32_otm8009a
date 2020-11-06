@@ -72,6 +72,10 @@ void lcd_draw_point(uint16_t x,uint16_t y, uint16_t color);
 void lcd_draw_line_h(uint16_t x0, uint16_t x1, uint16_t y, uint16_t color);
 void lcd_set_window(uint16_t xStar, uint16_t yStar, uint16_t xEnd, uint16_t yEnd);
 void lcd_set_cursor(uint16_t xpos, uint16_t ypos);
+void lcd_idle_mode_on(void);
+void lcd_idle_mode_off(void);
+void lcd_tearing_on(void);
+void lcd_tearing_off(void);
 
 #define FT5216_ADDR     0x70
 
@@ -298,9 +302,31 @@ void lcd_write_reg(uint16_t reg, uint16_t value)
   lcd_write_data(value);	    		 
 }	 
 
+void lcd_idle_mode_on(void)
+{
+  lcd_write_cmd(0x39); 
+}
+
+void lcd_idle_mode_off(void)
+{
+  lcd_write_cmd(0x34); 
+}
+
+void lcd_tearing_on(void)
+{
+  lcd_write_cmd(0x35);
+  lcd_write_data(0x01);  
+}
+
+void lcd_tearing_off(void)
+{
+  lcd_write_cmd(0x34);
+}
+
 void lcd_clear(uint16_t color)
 {
   uint16_t i, j;
+
   lcd_set_window(0, 0, lcd_get_width(), lcd_get_height());
   
   LCD_CS_CLR; 
@@ -759,6 +785,16 @@ void lcd_draw_line_v(uint16_t y0, uint16_t y1, uint16_t x, uint16_t color)
   }
 
   LCD_CS_SET;
+}
+
+void lcd_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color)
+{
+  uint16_t y = 0;
+  float slope = (y1 - y0)/(x1 - x0);
+  for(uint16_t x = x0; x < x1; x++){
+    y = slope * x + y0;
+    lcd_draw_point(x, y, color);
+  }
 }
 
 void lcd_draw_rect(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color)

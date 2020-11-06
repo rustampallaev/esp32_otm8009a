@@ -15,6 +15,7 @@ void lcd_fill(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color
 void lcd_draw_point(uint16_t x,uint16_t y, uint16_t color);
 void lcd_draw_line_h(uint16_t x0, uint16_t x1, uint16_t y, uint16_t color);
 void lcd_draw_line_v(uint16_t y0, uint16_t y1, uint16_t x, uint16_t color);
+void lcd_draw_line(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
 void lcd_draw_rect(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
 void lcd_draw_char(uint16_t x, uint16_t y, const char ch, const char *font, uint16_t backcolor, uint16_t forecolor);
 void lcd_draw_text(uint16_t x, uint16_t y, const char *text, const char *font, uint16_t backcolor, uint16_t forecolor);

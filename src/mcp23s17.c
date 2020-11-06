@@ -30,7 +30,7 @@ uint16_t _pullupCache = 0x0000;
 uint16_t _invertCache = 0x0000;
 
 
-void initHSPI(void);
+void init_spi(void);
 
 //********************************************************************
 //	Function Name:  MCP23S17_Initalize(uint8_t address)
@@ -53,7 +53,7 @@ void MCP23S17_Initalize(uint8_t address)
     gpio_set_level(SPI_PIN_NUM_RST, HIGH);
 
 
-    initHSPI();
+    init_spi();
 
 	_modeCache   = 0xFFFF; 
 	_outputCache = 0x0000;
@@ -266,7 +266,7 @@ bool mcp23S17_ReadPin(uint8_t address, uint8_t gpio)
 }
 
 
-void initHSPI(void)
+void init_spi(void)
 {
 	
 	// spi_bus_config_t
@@ -292,10 +292,10 @@ void initHSPI(void)
 	devcfg_mcp23S17.duty_cycle_pos = 0;
 	devcfg_mcp23S17.cs_ena_posttrans = 0;
 	devcfg_mcp23S17.cs_ena_pretrans = 0;
-	devcfg_mcp23S17.clock_speed_hz = 10000000;   
+	devcfg_mcp23S17.clock_speed_hz = SPI_MASTER_FREQ_40M;   
 	devcfg_mcp23S17.spics_io_num = SPI_PIN_NUM_CS;
 	devcfg_mcp23S17.flags = 0;
-	devcfg_mcp23S17.queue_size = 7;
+	devcfg_mcp23S17.queue_size = 4;
 	devcfg_mcp23S17.pre_cb = NULL;
 	devcfg_mcp23S17.post_cb = NULL;
 	ESP_ERROR_CHECK(spi_bus_add_device(MCP_HOST, &devcfg_mcp23S17, &handle_spi_mcp23S17));
